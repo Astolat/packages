@@ -1,0 +1,2 @@
+@astolat/utils:
+- packages/utils/**/*
