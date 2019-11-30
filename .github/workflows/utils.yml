@@ -16,7 +16,7 @@ jobs:
   install:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout ${{ github.ref }}
+      - name: Checkout ${{ github.head_ref }}
         uses: actions/checkout@master
         with:
           fetch-depth: 1
@@ -28,12 +28,12 @@ jobs:
           registry-url: ${{ env.registry_url }}
 
       - name: Install node_modules
-        run: yarn workspace ${{ github.workspace }} install
+        run: yarn workspace @astolat/${{ env.pkg_name }} install
 
-      - name: Upload ${{ github.workspace }} artifact
+      - name: Upload @astolat/${{ pkg_name }} artifact
         uses: actions/upload-artifact@master
         with:
-          name: ${{ github.workspace }}
+          name: "@astolat/${{ env.pkg_name }}"
           path: packages/${{ env.pkg_name }}
 
   lint:
@@ -43,7 +43,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@master
         with:
-          name: ${{ github.workspace }}
+          name: "@astolat/${{ env.pkg_name }}"
           path: ./
           
       - name: Setup Node.js
@@ -61,7 +61,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@master
         with:
-          name: ${{ github.workspace }}
+          name: "@astolat/${{ env.pkg_name }}"
           path: ./
           
       - name: Setup Node.js
@@ -80,7 +80,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@master
         with:
-          name: ${{ github.workspace }}
+          name: "@astolat/${{ env.pkg_name }}"
           path: ./
           
       - name: Setup Node.js
