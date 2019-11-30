@@ -1,0 +1,11 @@
+{
+  "name": "@astolat/main",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "version": "1.0.0",
+  "repository": "https://github.com/Astolat/main.git",
+  "author": "Astolat LLC <dev@astolat.com>",
+  "license": "MIT"
+}
