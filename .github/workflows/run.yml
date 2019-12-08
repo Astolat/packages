@@ -90,6 +90,7 @@ jobs:
       - name: Install global dependencies
         run: |
           yarn global add \
+            lerna \
             @commitlint/cli \
             @commitlint/config-conventional \
             @commitlint/config-lerna-scopes
