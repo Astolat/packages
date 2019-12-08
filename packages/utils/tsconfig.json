@@ -1,0 +1,23 @@
+{
+	"include": [
+		"src"
+	],
+	"exclude": [
+		"node_modules"
+	],
+	"compilerOptions": {
+		"allowJs": true,
+		"declaration": true,
+		"esModuleInterop": true,
+		"lib": ["esnext","dom"],
+		"outDir": "./dist",
+		"target": "es5",
+		"checkJs": true,
+		"baseUrl": "./",
+		"sourceMap": true,
+		"declarationMap": true,
+		"removeComments": true,
+		"strict": true,
+		"alwaysStrict": true
+	}
+}
