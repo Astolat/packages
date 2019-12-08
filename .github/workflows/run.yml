@@ -167,6 +167,7 @@ jobs:
         run: |
           lerna publish \
             --conventional-prerelease \
+            --no-changelog \
             --canary \
             --preid prerelease \
             --dist-tag 'pr${{ github.event.pull_request.number }}' \
