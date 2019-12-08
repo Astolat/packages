@@ -2,13 +2,6 @@ name: Run
 
 on:
   pull_request:
-    paths:
-      - 'packages/**/src/**.[jt]sx?'
-      - 'packages/**/package.json'
-      - '**/.*rc'
-      - '**/jest.config.js'
-      - '**/tsconfig.*'
-      - '**/yarn.lock'
     branches:
       - master
     types: [opened,synchronize,reopened,closed,labeled]
