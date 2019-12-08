@@ -37,5 +37,4 @@ jobs:
       - name: Validate commit messages
         run: |
           commitlint \
-            --from ${{ github.event.before }} \
             --to ${{ github.event.after }}
