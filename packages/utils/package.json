@@ -6,6 +6,7 @@
     "lint": "eslint --ext .js,.ts ./src",
     "test": "jest .",
     "build": "tsc -p ./tsconfig.build.json",
+    "docs": "typedoc --out ./docs ./src",
     "prepublish": "yarn build"
   },
   "license": "MIT",

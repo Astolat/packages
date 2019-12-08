@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'packages/**/src/**.[jt]sx?'
+      - 'packages/**/package.json'
       - '**/.*rc'
       - '**/jest.config.js'
       - '**/tsconfig.*'
@@ -23,8 +24,6 @@ jobs:
     steps:
       - name: Checkout ${{ github.head_ref }}
         uses: actions/checkout@v1.2.0
-        with:
-          fetch-depth: 1
 
       - name: Read .nvmrc
         run: |
@@ -66,8 +65,6 @@ jobs:
       - name: Checkout ${{ github.head_ref }}
         if: github.event.action != 'labeled'
         uses: actions/checkout@v1.2.0
-        with:
-          fetch-depth: 1
 
       - name: Read .nvmrc
         if: github.event.action != 'labeled'
@@ -124,8 +121,6 @@ jobs:
     steps:
       - name: Checkout ${{ github.head_ref }}
         uses: actions/checkout@v1.2.0
-        with:
-          fetch-depth: 1
 
       - name: Read .nvmrc
         run: |
@@ -184,7 +179,7 @@ jobs:
       - name: Checkout ${{ github.head_ref }}
         uses: actions/checkout@v1.2.0
         with:
-          fetch-depth: 1
+          ref: ${{ github.base_ref }}
 
       - name: Read .nvmrc
         run: |
