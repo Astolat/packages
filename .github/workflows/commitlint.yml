@@ -1,0 +1,44 @@
+name: Commitlint
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  commitlint:
+    name: Commitlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.head_ref }}
+        with:
+          fetch-depth: 1
+
+      - name: Read .nvmrc
+        run: |
+          echo "::set-env name=node-version::$(cat ./.nvmrc)"
+
+      - name: Setup Node.js v${{ env.node-version }}
+        uses: actions/setup-node@v1.3.0
+        with:
+          node-version: ${{ env.node-version }}
+
+      - name: Add yarn global to path
+        run: |
+          echo "::add-path::$(yarn global bin)"
+
+      - name: Install global dependencies
+        run: |
+          yarn global add \
+            lerna \
+            @commitlint/cli \
+            @commitlint/config-conventional \
+            @commitlint/config-lerna-scopes
+
+      - name: Validate commit message
+        run: |
+          commitlint \
+            --from origin/master \
+            --to HEAD

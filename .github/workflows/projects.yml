@@ -1,0 +1,102 @@
+name: Update Projects
+on:
+  pull_request:
+    paths:
+      - 'packages/**'
+    branches:
+      - master
+
+jobs:
+  projects:
+    name: Update Projects
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.head_ref }}
+        with:
+          fetch-depth: 1
+
+      - name: Read .nvmrc
+        run: |
+          echo "::set-env name=node-version::$(cat ./.nvmrc)"
+
+      - name: Setup Node.js v${{ env.node-version }}
+        uses: actions/setup-node@v1.3.0
+        with:
+          node-version: ${{ env.node-version }}
+
+      - name: Add yarn global to path
+        run: |
+          echo "::add-path::$(yarn global bin)"
+
+      - name: Install global dependencies
+        run: |
+          yarn global add lerna
+
+      - name: Update Projects
+        uses: actions/github-script@0.3.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const eventAction = ${{ toJson(github.event.action) }};
+            const pr = ${{ toJson(github.event.pull_request) }};
+            const projects = await github.projects.listForRepo({
+              ...context.issue,
+              state: 'all',
+            }).then(({ data }) => data);
+            const projectNames = projects.map(({ name }) => name);
+            const packages = ${{ env.packages }};
+            const newProjectNames = packages
+              .filter(name => !projectNames.includes(name));
+
+            const newProjects = await Promise.all(
+              newProjectNames.map(name => (
+                github.projects.createForRepo({
+                  ...context.issue,
+                  name,
+                }).then(({ data }) => data)
+              ))
+            );
+
+            projects.push(...newProjects);
+
+            const columnName = eventAction === 'closed' ? 'Done' : 'In Progress';
+            const columns = await Promise.all(
+              projects.map(project => (
+                github.projects.listColumns({
+                  project_id: project.id,
+                })
+                  .then(({ data }) => data)
+                  .then(async (columns) => (
+                    columns.find(({ name }) => name === columnName) ||
+                    await github.projects.createColumn({
+                      project_id: project.id,
+                      name: columnName,
+                    }).then(({ data }) => data)
+                  ))
+                  .then(column => ({
+                    ...column,
+                    project,
+                  }))
+              ))
+            );
+
+            const changed = ${{ env.changed }};
+            const targetColumns = columns
+              .filter(({ project: { name } }) => changed.includes(name));
+
+            const cards = await Promise.all(
+              targetColumns.map(({ id }) => (
+                github.projects.listCards({
+                  column_id: id,
+                })
+                .then(({ data }) => data)
+                .then(async (cards) => (
+                  cards.find(({ content_url }) => content_url === pr.issue_url) ||
+                  await github.projects.createCard({
+                    column_id: id,
+                    content_id: pr.id,
+                    content_type: 'PullRequest',
+                  }).then(({ data }) => data)
+                ))
+              ))
+            );
