@@ -9,9 +9,6 @@ jobs:
     name: Commitlint
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          node -e "console.dir(${{ toJson(github) }}, { colors: true, depth: Infinity })"
-
       - name: Checkout ${{ github.head_ref }}
         uses: actions/checkout@v1.2.0
         with:
@@ -36,5 +33,5 @@ jobs:
       - name: Validate commit messages
         run: |
           commitlint \
-            --from origin/master \
-            --to HEAD
+            --from ${{ github.event.before }} \
+            --to ${{ github.event.after }}

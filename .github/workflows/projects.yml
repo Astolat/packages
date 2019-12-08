@@ -32,6 +32,8 @@ jobs:
       - name: Install global dependencies
         run: |
           yarn global add lerna
+          echo "::set-env name=packages::$(node -p "JSON.stringify($(lerna la --json).map(({ name }) => name))")"
+          echo "::set-env name=changed::$(node -p "JSON.stringify($(lerna ls --since origin/${{ github.base_ref }} --exclude-dependents --json).map(({ name }) => name))")"
 
       - name: Update Projects
         uses: actions/github-script@0.3.0
