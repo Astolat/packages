@@ -1,0 +1,24 @@
+{
+  "command": {
+    "publish": {
+      "ignoreChanges": [
+        "*.md",
+        "*.spec.*"
+      ],
+      "npmClient": "npm",
+      "registry": "https://registry.npmjs.org/",
+      "conventionalCommits": true
+    },
+    "bootstrap": {
+      "forceLocal": true,
+      "includeDependents": true,
+      "includeDependencies": true
+    }
+  },
+  "npmClient": "yarn",
+  "packages": [
+    "packages/**"
+  ],
+  "useWorkspaces": true,
+  "version": "independent"
+}

@@ -2,10 +2,19 @@
   "name": "@astolat/main",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/**"
   ],
   "version": "1.0.0",
-  "repository": "https://github.com/Astolat/main.git",
+  "repository": "https://github.com/astolat/main",
   "author": "Astolat LLC <dev@astolat.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "globby": "^10.0.1",
+    "jest": "^24.9.0",
+    "lerna": "^3.16.4",
+    "ts-jest": "^24.2.0"
+  }
 }
