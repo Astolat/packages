@@ -1,6 +1,8 @@
 name: Release
 on:
   pull_request:
+    paths:
+      - 'packages/**'
     branches:
       - master
     types: [closed]
