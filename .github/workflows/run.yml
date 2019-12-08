@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'packages/**/src/**.[jt]sx?'
+      - 'packages/**/package.json'
       - '**/.*rc'
       - '**/jest.config.js'
       - '**/tsconfig.*'
