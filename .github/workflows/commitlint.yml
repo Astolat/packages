@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Count commits
         run: |
-          echo "::set-env name=commit-count::$(node -p "${{ toJson(github.event.commits.*.id) }}.length")"
+          echo "::set-env name=commit-count::$(node -p '${{ toJson(github.event.commits.*.id) }}.length')"
 
       - name: Checkout ${{ github.head_ref }}
         uses: actions/checkout@v1.2.0
