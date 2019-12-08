@@ -2,10 +2,25 @@
   "name": "@astolat/main",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/**"
   ],
   "version": "1.0.0",
-  "repository": "https://github.com/Astolat/main.git",
+  "repository": "https://github.com/astolat/main",
   "author": "Astolat LLC <dev@astolat.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "commit": "commit"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "@commitlint/config-lerna-scopes": "^8.2.0",
+    "@commitlint/prompt-cli": "^8.2.0",
+    "conventional-changelog-conventionalcommits": "^4.2.3",
+    "globby": "^10.0.1",
+    "husky": "^3.1.0",
+    "jest": "^24.9.0",
+    "lerna": "^3.16.4",
+    "ts-jest": "^24.2.0"
+  }
 }

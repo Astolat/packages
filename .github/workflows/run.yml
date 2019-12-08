@@ -1,0 +1,232 @@
+name: Run
+
+on:
+  pull_request:
+    paths:
+      - 'packages/**/src/**.[jt]sx?'
+      - '**/.*rc'
+      - '**/jest.config.js'
+      - '**/tsconfig.*'
+      - '**/yarn.lock'
+    branches:
+      - master
+    types: [opened,synchronize,reopened,closed,labeled]
+
+env:
+  scope: '@astolat'
+  registry-url: 'https://registry.npmjs.org/'
+
+jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.head_ref }}
+        uses: actions/checkout@v1.2.0
+        with:
+          fetch-depth: 1
+
+      - name: Read .nvmrc
+        run: |
+          echo "::set-env name=node-version::$(cat ./.nvmrc)"
+
+      - name: Setup Node.js v${{ env.node-version }}
+        uses: actions/setup-node@v1.3.0
+        with:
+          node-version: ${{ env.node-version }}
+          scope: ${{ env.scope }}
+          registry-url: ${{ env.registry-url }}
+
+      - name: Set variables
+        run: |
+          echo "::set-env name=yarn-cache::$(yarn cache dir)"
+
+      - name: Restore yarn cache
+        id: cache
+        uses: actions/cache@v1.0.3
+        with:
+          path: ${{ env.yarn-cache }}
+          key: yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-cache-
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+  run:
+    name: Run
+    runs-on: ubuntu-latest
+    needs: [setup]
+    if: github.event.action != 'closed'
+    strategy:
+      matrix:
+        command: [lint,test,build]
+    steps:
+      - name: Checkout ${{ github.head_ref }}
+        if: github.event.action != 'labeled'
+        uses: actions/checkout@v1.2.0
+        with:
+          fetch-depth: 1
+
+      - name: Read .nvmrc
+        if: github.event.action != 'labeled'
+        run: |
+          echo "::set-env name=node-version::$(cat ./.nvmrc)"
+
+      - name: Setup Node.js v${{ env.node-version }}
+        if: github.event.action != 'labeled'
+        uses: actions/setup-node@v1.3.0
+        with:
+          node-version: ${{ env.node-version }}
+          scope: ${{ env.scope }}
+          registry-url: ${{ env.registry-url }}
+
+      - name: Set variables
+        if: github.event.action != 'labeled'
+        run: |
+          echo "::set-env name=yarn-cache::$(yarn cache dir)"
+          echo "::add-path::$(yarn global bin)"
+
+      - name: Restore yarn cache
+        if: github.event.action != 'labeled'
+        uses: actions/cache@v1.0.3
+        with:
+          path: ${{ env.yarn-cache }}
+          key: yarn-cache-${{ hashFiles('yarn.lock') }}
+
+      - name: Install global dependencies
+        if: github.event.action != 'labeled'
+        run: |
+          yarn global add lerna
+
+      - name: Bootstrap
+        if: github.event.action != 'labeled'
+        run: |
+          lerna bootstrap \
+            --since origin/${{ github.base_ref }}
+
+      - name: Run ${{ matrix.command }} for changed packages
+        if: github.event.action != 'labeled'
+        env:
+          CI: true
+        run: |
+          lerna run ${{ matrix.command }} \
+            --since origin/${{ github.base_ref }} \
+            --stream \
+            --parallel
+
+  prerelease:
+    name: Pre-Release
+    runs-on: ubuntu-latest
+    needs: [setup,run]
+    if: github.event.action != 'closed' && contains(github.event.pull_request.labels.*.name, 'prerelease')
+    steps:
+      - name: Checkout ${{ github.head_ref }}
+        uses: actions/checkout@v1.2.0
+        with:
+          fetch-depth: 1
+
+      - name: Read .nvmrc
+        run: |
+          echo "::set-env name=node-version::$(cat ./.nvmrc)"
+
+      - name: Setup Node.js v${{ env.node-version }}
+        uses: actions/setup-node@v1.3.0
+        with:
+          node-version: ${{ env.node-version }}
+          scope: ${{ env.scope }}
+          registry-url: ${{ env.registry-url }}
+
+      - name: Set variables
+        run: |
+          echo "::set-env name=yarn-cache::$(yarn cache dir)"
+          echo "::add-path::$(yarn global bin)"
+
+      - name: Restore yarn cache
+        uses: actions/cache@v1.0.3
+        with:
+          path: ${{ env.yarn-cache }}
+          key: yarn-cache-${{ hashFiles('yarn.lock') }}
+
+      - name: Install global dependencies
+        run: |
+          yarn global add lerna
+
+      - name: Bootstrap
+        run: |
+          lerna bootstrap \
+            --since origin/${{ github.base_ref }}
+
+      - name: Publish (pr${{ github.event.pull_request.number }})
+        env:
+          CI: true
+          NODE_ENV: production
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          lerna publish \
+            --conventional-prerelease \
+            --no-changelog \
+            --canary \
+            --preid prerelease \
+            --dist-tag 'pr${{ github.event.pull_request.number }}' \
+            --no-verify-access \
+            --amend \
+            --yes
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [setup]
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
+    steps:
+      - name: Checkout ${{ github.head_ref }}
+        uses: actions/checkout@v1.2.0
+        with:
+          fetch-depth: 1
+
+      - name: Read .nvmrc
+        run: |
+          echo "::set-env name=node-version::$(cat ./.nvmrc)"
+
+      - name: Setup Node.js v${{ env.node-version }}
+        uses: actions/setup-node@v1.3.0
+        with:
+          node-version: ${{ env.node-version }}
+          scope: ${{ env.scope }}
+          registry-url: ${{ env.registry-url }}
+
+      - name: Set variables
+        run: |
+          echo "::set-env name=yarn-cache::$(yarn cache dir)"
+          echo "::add-path::$(yarn global bin)"
+
+      - name: Restore yarn cache
+        uses: actions/cache@v1.0.3
+        with:
+          path: ${{ env.yarn-cache }}
+          key: yarn-cache-${{ hashFiles('yarn.lock') }}
+
+      - name: Install global dependencies
+        run: |
+          yarn global add lerna
+
+      - name: Bootstrap
+        run: |
+          lerna bootstrap \
+            --since origin/${{ github.base_ref }}
+
+      - name: Publish (latest)
+        env:
+          CI: true
+          NODE_ENV: production
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          lerna publish \
+            --no-verify-access \
+            --create-release github \
+            --message 'chore(release): published' \
+            --changelog-preset conventionalcommits \
+            --yes

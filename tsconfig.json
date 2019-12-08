@@ -1,0 +1,9 @@
+{
+	"include": [
+		"packages/**/*.ts",
+		"packages/**/*.js"
+	],
+	"exclude": [
+		"**/node_modules"
+	]
+}
