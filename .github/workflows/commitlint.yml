@@ -29,13 +29,11 @@ jobs:
         run: |
           echo "::add-path::$(yarn global bin)"
 
-      - name: Install global dependencies
+      - name: Install dependencies
         run: |
           yarn global add \
-            lerna \
-            @commitlint/cli \
-            @commitlint/config-conventional \
-            @commitlint/config-lerna-scopes
+            @commitlint/cli
+          yarn install
 
       - name: Validate commit message
         run: |
