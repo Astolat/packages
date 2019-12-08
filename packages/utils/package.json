@@ -5,7 +5,8 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts ./src",
     "test": "jest .",
-    "build": "tsc -p ./tsconfig.build.json"
+    "build": "tsc -p ./tsconfig.build.json",
+    "prepublish": "yarn build"
   },
   "license": "MIT",
   "devDependencies": {
