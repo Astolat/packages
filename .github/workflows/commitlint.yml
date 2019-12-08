@@ -9,6 +9,9 @@ jobs:
     name: Commitlint
     runs-on: ubuntu-latest
     steps:
+      - run: |
+          node -e "console.dir(${{ toJson(github) }}, { colors: true, depth: Infinity })"
+
       - name: Checkout ${{ github.head_ref }}
         uses: actions/checkout@v1.2.0
         with:
@@ -23,17 +26,14 @@ jobs:
         with:
           node-version: ${{ env.node-version }}
 
-      - name: Add yarn global to path
-        run: |
-          echo "::add-path::$(yarn global bin)"
-
       - name: Install dependencies
         run: |
-          yarn global add \
-            @commitlint/cli
-          yarn install
+          npm install -g @commitlint/cli
+          npm install \
+            lerna \
+            @commitlint/{config-conventional,config-lerna-scopes}
 
-      - name: Validate commit message
+      - name: Validate commit messages
         run: |
           commitlint \
             --from origin/master \
