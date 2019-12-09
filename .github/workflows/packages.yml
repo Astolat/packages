@@ -83,30 +83,31 @@ jobs:
           path: ${{ env.yarn-cache }}
           key: yarn-cache-${{ hashFiles('yarn.lock') }}
 
-      - name: Install global dependencies
+      - name: Install dependencies
         run: |
-          yarn global add lerna
-
-      - name: Bootstrap
-        run: |
-          lerna bootstrap \
-            --since origin/${{ github.base_ref }}
+          yarn
 
       - name: Run ${{ matrix.command }} for changed packages
         run: |
+          CMD='${{ matrix.command }}'
           ARGS=''
 
-          case '${{ matrix.command }}' in
+          case ${CMD} in
             lint)
-              ARGS='--format compact'
+              CMD='yarn eslint'
+              ARGS=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }} -- '***.[jt]s' '***.[jt]sx')
+              [[ "${ARGS}" == "" ]] && exit 0
+              ;;
+            test)
+              ARGS='--changedSince origin/${{ github.base_ref }}'
+              lerna bootstrap --since origin/${{ github.base_ref }}
+              ;;
+            build)
+              ARGS='--since origin/${{ github.base_ref }}'
               ;;
           esac
 
-          lerna run ${{ matrix.command }} \
-            --since origin/${{ github.base_ref }} \
-            --stream \
-            --parallel \
-            -- ${ARGS}
+          yarn ${CMD} ${ARGS}
 
   prerelease:
     name: Pre-Release
