@@ -94,7 +94,7 @@ jobs:
 
           case ${CMD} in
             lint)
-              CMD='yarn eslint'
+              CMD='eslint'
               ARGS=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }} -- '***.[jt]s' '***.[jt]sx')
               [[ "${ARGS}" == "" ]] && exit 0
               ;;
