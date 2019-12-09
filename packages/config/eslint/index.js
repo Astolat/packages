@@ -72,5 +72,6 @@ module.exports = {
 			exports: 'always-multiline',
 		}],
 		'quotes': [ERROR, 'single', { allowTemplateLiterals: true }],
+		'sort-imports': OFF,
 	},
 };
