@@ -1,10 +1,11 @@
 {
 	"include": [
 		"**/*.ts",
-		"**/*.js",
+		"**/*.js"
 	],
 	"exclude": [
-		"**/node_modules"
+		"node_modules",
+		"dist"
 	],
 	"compilerOptions": {
 		"allowJs": true,

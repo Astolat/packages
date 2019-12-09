@@ -20,24 +20,18 @@
     "@commitlint/config-lerna-scopes": "^8.2.0",
     "@commitlint/prompt-cli": "^8.2.0",
     "@types/jest": "^24.0.23",
-    "@types/node": "^12.12.14",
-    "@typescript-eslint/eslint-plugin": "^2.10.0",
-    "@typescript-eslint/parser": "^2.10.0",
+    "@types/node": "^12.12.15",
     "conventional-changelog-conventionalcommits": "^4.2.3",
     "eslint": "^6.7.2",
-    "eslint-plugin-jest": "^23.1.1",
-    "eslint-plugin-json": "^2.0.1",
-    "globby": "^10.0.1",
     "husky": "^3.1.0",
     "jest": "^24.9.0",
     "jest-watch-yarn-workspaces": "^1.1.0",
-    "lerna": "^3.16.4",
-    "lint-diff": "^1.2.1",
-    "ts-jest": "^24.2.0",
-    "typedoc": "^0.15.3",
+    "lerna": "^3.19.0",
+    "typedoc": "^0.15.4",
     "typescript": "^3.7.3"
   },
   "dependencies": {
+    "@astolat/eslint-config": "link:packages/config/eslint",
     "@astolat/jest-config": "link:packages/config/jest",
     "@astolat/utils": "link:packages/utils"
   }
