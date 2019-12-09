@@ -101,7 +101,6 @@ jobs:
               ;;
             test)
               ARGS='--changedSince origin/${{ github.base_ref }}'
-              lerna bootstrap --since origin/${{ github.base_ref }}
               ;;
             build)
               ARGS='--since origin/${{ github.base_ref }}'
