@@ -57,7 +57,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        command: [lint,test,build]
+        command: [lint,test,check]
     steps:
       - name: Checkout ${{ github.head_ref }}
         uses: actions/checkout@v1.2.0
@@ -91,19 +91,21 @@ jobs:
       - name: Run ${{ matrix.command }} for changed packages
         run: |
           CMD='${{ matrix.command }}'
-          ARGS=''
+          ARGS=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }} -- '***.[jt]s' '***.[jt]sx')
+
+          [[ "${ARGS}" == "" ]] && exit 0
 
           case ${CMD} in
             lint)
               CMD='eslint'
-              ARGS=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }} -- '***.[jt]s' '***.[jt]sx')
-              [[ "${ARGS}" == "" ]] && exit 0
+              ARGS=${FILES}
               ;;
             test)
               ARGS='--changedSince origin/${{ github.base_ref }}'
               ;;
-            build)
-              ARGS='--since origin/${{ github.base_ref }}'
+            check)
+              echo `node -p "JSON.stringify({ ...require('./tsconfig.json'), files: process.argv[1].split(/[\r\n]+/g) })" "${ARGS}"` > ./tsconfig.json
+              ARGS=''
               ;;
           esac
 

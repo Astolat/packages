@@ -4,6 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -p ./tsconfig.build.json",
+    "check": "yarn build --noEmit",
     "prepublish": "yarn build"
   },
   "license": "MIT",

@@ -12,7 +12,8 @@
     "commit": "commit",
     "test": "jest",
     "lint": "eslint .",
-    "build": "lerna run build"
+    "build": "lerna run build",
+    "check": "tsc -p ./tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",
