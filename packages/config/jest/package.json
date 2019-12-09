@@ -21,9 +21,8 @@
     "directory": "packages/config/jest"
   },
   "peerDependencies": {
-    "jest-watch-yarn-workspaces": "^1.1.0",
     "jest": "^24.9.0",
-    "ts-jest": "^24.2.0",
+    "jest-watch-yarn-workspaces": "^1.1.0",
     "typescript": "^3.7.3"
   },
   "peerDependenciesMeta": {
@@ -32,6 +31,7 @@
     }
   },
   "dependencies": {
-    "globby": "^10.0.1"
+    "globby": "^10.0.1",
+    "ts-jest": "^24.2.0"
   }
 }

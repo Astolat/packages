@@ -58,7 +58,6 @@ module.exports = {
 			rootDir: path.join(process.cwd(), dirname),
 			transform: {
 				'\\.tsx?$': 'ts-jest',
-				'\\.jsx?$': 'babel-jest',
 			},
 			setupFiles: [
 				path.join(__dirname, 'jest-setup.js'),

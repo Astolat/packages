@@ -91,14 +91,15 @@ jobs:
       - name: Run ${{ matrix.command }} for changed packages
         run: |
           CMD='${{ matrix.command }}'
-          ARGS=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }} -- '***.[jt]s' '***.[jt]sx')
+          ARGS=`git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }} -- '***.[jt]s' '***.[jt]sx'`
+          COUNT=`echo ${ARGS} | wc -l`
 
-          [[ "${ARGS}" == "" ]] && exit 0
+          [[ "${COUNT}" == "0" ]] && exit 0
 
           case ${CMD} in
             lint)
               CMD='eslint'
-              ARGS=${FILES}
+              ARGS=${ARGS}
               ;;
             test)
               ARGS='--changedSince origin/${{ github.base_ref }}'
@@ -110,6 +111,9 @@ jobs:
           esac
 
           yarn ${CMD} ${ARGS}
+
+          git checkout -- ./tsconfig.json
+
 
   prerelease:
     name: Pre-Release
