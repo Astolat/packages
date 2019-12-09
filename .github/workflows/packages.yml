@@ -53,21 +53,20 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     needs: [setup]
+    if: github.event.action != 'labeled'
     strategy:
+      fail-fast: false
       matrix:
         command: [lint,test,build]
     steps:
       - name: Checkout ${{ github.head_ref }}
-        if: github.event.action != 'labeled'
         uses: actions/checkout@v1.2.0
 
       - name: Read .nvmrc
-        if: github.event.action != 'labeled'
         run: |
           echo "::set-env name=node-version::$(cat ./.nvmrc)"
 
       - name: Setup Node.js v${{ env.node-version }}
-        if: github.event.action != 'labeled'
         uses: actions/setup-node@v1.3.0
         with:
           node-version: ${{ env.node-version }}
@@ -75,38 +74,40 @@ jobs:
           registry-url: ${{ env.registry-url }}
 
       - name: Set variables
-        if: github.event.action != 'labeled'
         run: |
           echo "::set-env name=yarn-cache::$(yarn cache dir)"
           echo "::add-path::$(yarn global bin)"
 
       - name: Restore yarn cache
-        if: github.event.action != 'labeled'
         uses: actions/cache@v1.0.3
         with:
           path: ${{ env.yarn-cache }}
           key: yarn-cache-${{ hashFiles('yarn.lock') }}
 
-      - name: Install global dependencies
-        if: github.event.action != 'labeled'
+      - name: Install dependencies
         run: |
-          yarn global add lerna
-
-      - name: Bootstrap
-        if: github.event.action != 'labeled'
-        run: |
-          lerna bootstrap \
-            --since origin/${{ github.base_ref }}
+          yarn
 
       - name: Run ${{ matrix.command }} for changed packages
-        if: github.event.action != 'labeled'
-        env:
-          CI: true
         run: |
-          lerna run ${{ matrix.command }} \
-            --since origin/${{ github.base_ref }} \
-            --stream \
-            --parallel
+          CMD='${{ matrix.command }}'
+          ARGS=''
+
+          case ${CMD} in
+            lint)
+              CMD='eslint'
+              ARGS=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }} -- '***.[jt]s' '***.[jt]sx')
+              [[ "${ARGS}" == "" ]] && exit 0
+              ;;
+            test)
+              ARGS='--changedSince origin/${{ github.base_ref }}'
+              ;;
+            build)
+              ARGS='--since origin/${{ github.base_ref }}'
+              ;;
+          esac
+
+          yarn ${CMD} ${ARGS}
 
   prerelease:
     name: Pre-Release
