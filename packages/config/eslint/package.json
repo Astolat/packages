@@ -1,0 +1,21 @@
+{
+	"name": "@astolat/eslint-config",
+	"version": "0.0.0",
+	"publishConfig": {
+		"access": "public"
+	},
+	"license": "MIT",
+	"main": "index.js",
+	"peerDependencies": {
+		"eslint": "^6.7.2"
+	},
+	"dependencies": {
+		"@typescript-eslint/eslint-plugin": "^2.11.0",
+		"@typescript-eslint/parser": "^2.11.0",
+		"eslint-plugin-import": "^2.19.1",
+		"eslint-plugin-jest": "^23.1.1",
+		"eslint-plugin-react": "^7.17.0",
+		"eslint-plugin-react-hooks": "^2.3.0"
+	},
+	"devDependencies": {}
+}
