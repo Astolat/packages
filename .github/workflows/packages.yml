@@ -57,7 +57,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        command: [lint,test,check]
+        command: [lint,test,typecheck]
     steps:
       - name: Checkout ${{ github.head_ref }}
         uses: actions/checkout@v1.2.0
@@ -92,20 +92,26 @@ jobs:
         run: |
           CMD='${{ matrix.command }}'
           ARGS=`git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }} -- '***.[jt]s' '***.[jt]sx'`
-          COUNT=`echo ${ARGS} | wc -l`
+          COUNT=`echo ${ARGS} | wc -l | tr -d '[:space:]'`
 
-          [[ "${COUNT}" == "0" ]] && exit 0
+          if [[ "${COUNT}" == "0" ]]; then
+            echo "Skipping ${{ matrix.command }} - No relevant changes"
+            exit 0
+          fi
+
+          echo "Running ${{ matrix.command }} for ${COUNT} files"
+          echo ${ARGS}
 
           case ${CMD} in
             lint)
               CMD='eslint'
-              ARGS=${ARGS}
               ;;
             test)
               ARGS='--changedSince origin/${{ github.base_ref }}'
               ;;
-            check)
-              echo `node -p "JSON.stringify({ ...require('./tsconfig.json'), files: process.argv[1].split(/[\r\n]+/g) })" "${ARGS}"` > ./tsconfig.json
+            typecheck)
+              echo `node -p "JSON.stringify({ ...require('./tsconfig.json'), files: process.argv[1].trim().split(/[\r\n]+/g) })" "${ARGS}"` > ./tsconfig.json
+              cat ./tsconfig.json
               ARGS=''
               ;;
           esac

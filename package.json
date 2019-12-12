@@ -13,7 +13,7 @@
     "test": "jest",
     "lint": "eslint .",
     "build": "lerna run build",
-    "check": "tsc -p ./tsconfig.json --noEmit"
+    "typecheck": "tsc -p ./tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",
@@ -21,7 +21,7 @@
     "@commitlint/config-lerna-scopes": "^8.2.0",
     "@commitlint/prompt-cli": "^8.2.0",
     "@types/jest": "^24.0.23",
-    "@types/node": "^12.12.15",
+    "@types/node": "^12.12.17",
     "conventional-changelog-conventionalcommits": "^4.2.3",
     "eslint": "^6.7.2",
     "husky": "^3.1.0",
@@ -32,8 +32,8 @@
     "typescript": "^3.7.3"
   },
   "dependencies": {
-    "@astolat/eslint-config": "link:packages/config/eslint",
-    "@astolat/jest-config": "link:packages/config/jest",
-    "@astolat/utils": "link:packages/utils"
+    "@astolat/eslint-config": "file:packages/config/eslint",
+    "@astolat/jest-config": "file:packages/config/jest",
+    "@astolat/utils": "file:packages/utils"
   }
 }
