@@ -46,6 +46,11 @@ jobs:
             const packages = ${{ env.packages }};
             const changed = ${{ env.changed }};
 
+            console.dir(pr, {
+              colors: true,
+              depth: 1,
+            });
+
             const mapKeys = (arr, key = 'name') => (
                 uniq(flatten(arr).map(item => item[key]))
             );
@@ -120,7 +125,6 @@ jobs:
                 console.dir({
                   column,
                   existingCards,
-                  'pr.id': pr.id,
                 });
 
                 const cards = existingCards
