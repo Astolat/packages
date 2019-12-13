@@ -1,8 +1,6 @@
 name: Release
 on:
   pull_request:
-    paths:
-      - 'packages/**'
     branches:
       - master
     types: [closed]
@@ -13,10 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
+      - run: |
+          node -e 'console.dir(${{ toJson(github) }}, { colors: true })'
+
       - name: Checkout ${{ github.base_ref }}
         uses: actions/checkout@v2-beta
         with:
           ref: ${{ github.base_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Read .nvmrc
         run: |
@@ -43,11 +45,6 @@ jobs:
       - name: Install global dependencies
         run: |
           yarn global add lerna
-
-      - name: Bootstrap
-        run: |
-          lerna bootstrap \
-            --since origin/${{ github.base_ref }}
 
       - name: Publish (latest)
         env:
