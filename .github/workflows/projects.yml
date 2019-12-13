@@ -181,6 +181,7 @@ jobs:
                     card,
                 }, {
                     colors: true,
+                    depth: 100,
                 });
 
                 if (!changed.includes(project.name)) {
