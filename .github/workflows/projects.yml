@@ -160,6 +160,15 @@ jobs:
                 return 'Code Review';
             })();
 
+            console.dir({
+              projects,
+              allColumns,
+              allCards,
+            }, {
+              colors: true,
+              depth: 3,
+            });
+
             await sequence(projects, async (project) => {
                 const columns = allColumns
                     .filter(({
@@ -172,8 +181,19 @@ jobs:
                 const columnIds = mapKeys(columns, 'id');
                 const card = allCards
                     .find(({ column_id }) => (
-                        columnIds.includes(column_id)
+                        columnIds.some(id => (
+                          id == column_id
+                        ))
                     ));
+
+                console.dir({
+                  project,
+                  columns,
+                  card,
+                }, {
+                  colors: true,
+                  depth: 3,
+                });
 
                 if (!changed.includes(project.name)) {
                     // This project is untouched
