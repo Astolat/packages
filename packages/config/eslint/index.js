@@ -12,6 +12,9 @@ module.exports = {
 			jsx: true,
 		},
 	},
+	env: {
+		es6: true,
+	},
 	ignorePatterns: [
 		'**/node_modules/**',
 		'**/dist/**',

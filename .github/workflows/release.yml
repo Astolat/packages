@@ -61,6 +61,6 @@ jobs:
           lerna publish \
             --no-verify-access \
             --create-release github \
-            --message 'chore: published new versions' \
+            --amend \
             --changelog-preset conventionalcommits \
             --yes

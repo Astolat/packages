@@ -1,15 +1,10 @@
 {
   "name": "@astolat/jest-config",
   "version": "0.0.2",
-  "publishConfig": {
-    "access": "public"
-  },
-  "license": "MIT",
+  "description": "",
   "main": "jest-preset.js",
-  "files": [
-    "jest-preset.js",
-    "jest-setup.js"
-  ],
+  "author": "Astolat LLC <dev@astolat.com>",
+  "license": "MIT",
   "keywords": [
     "jest",
     "jest-preset",
@@ -20,6 +15,14 @@
     "url": "https://github.com/Astolat/main.git",
     "directory": "packages/config/jest"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "jest-preset.js",
+    "jest-setup.js"
+  ],
+  "bugs": "https://github.com/Astolat/main/issues?q=is:issue+project:@astolat/jest-config",
   "peerDependencies": {
     "jest": "^24.9.0",
     "jest-watch-yarn-workspaces": "^1.1.0",
