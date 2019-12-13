@@ -81,8 +81,6 @@ jobs:
               }).then(({ data }) => data);
               const projectNames = uniq(flatten(mapNames(existingProjects), packages));
 
-              console.log('projectNames', projectNames);
-
               return await sequence(projectNames, projectName => (
                 existingProjects.find(({ name }) => name === projectName) ||
                 github.projects.createForRepo({
@@ -99,9 +97,6 @@ jobs:
                 project_id: project.id,
               }).then(({ data }) => data);
               const columnNames = uniq(flatten(mapNames(existingColumns), requiredColumnNames));
-
-              console.log('columnNames', columnNames);
-
               const columns = await sequence(columnNames, columnName => (
                 existingColumns.find(({ name }) => name === columnName) ||
                 github.projects.createColumn({
@@ -109,6 +104,10 @@ jobs:
                   name: columnName,
                 }).then(({ data }) => data)
               ));
+
+              columns.forEach((column) => {
+                Object.assign(column, { project });
+              });
 
               Object.assign(project, { columns });
 
