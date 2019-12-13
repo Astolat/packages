@@ -167,6 +167,14 @@ jobs:
                     // There's an existing card
                     console.log(`Existing Card in ${project.name}`);
 
+                    console.dir({
+                      card,
+                      targetColumn,
+                    }, {
+                      colors: true,
+                      depth: 1,
+                    });
+
                     if (card.column_id == targetColumn.id) {
                         console.log(`Existing Card already in ${project.name} (${targetColumn.name})`);
                         // The card is where it belongs
