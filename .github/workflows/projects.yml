@@ -165,48 +165,40 @@ jobs:
 
                 if (card) {
                     // There's an existing card
-                    console.log(`Existing Card in ${project.name}`);
-
-                    console.dir({
-                      card,
-                      targetColumn,
-                    }, {
-                      colors: true,
-                      depth: 1,
-                    });
-
-                    if (card.column_id == targetColumn.id) {
-                        console.log(`Existing Card already in ${project.name} (${targetColumn.name})`);
+                    if (card.column_url === targetColumn.url) {
                         // The card is where it belongs
-                        return;
+                        console.log(`Existing Card already in ${project.name} (${targetColumn.name})`);
+                    } else {
+                        // Move card to the target column
+                        console.log(`Existing Card in ${project.name} moved to (${targetColumn.name})`);
+                        await github.projects.moveCard({
+                            card_id: card.id,
+                            position: 'top',
+                            column_id: targetColumn.id,
+                        });
                     }
 
-                    // Move card to the target column
-                    console.log(`Existing Card in ${project.name} moved to (${targetColumn.name})`);
-                    await github.projects.moveCard({
-                        card_id: card.id,
-                        position: 'top',
-                        column_id: targetColumn.id,
-                    });
-
                     if (eventAction === 'closed') {
-                        if (!pr.merged) {
+                        if (
+                            !pr.merged &&
+                            !card.archived
+                        ) {
+                            // PR closed without merging
                             console.log(`Archiving Card for unmerged PR`);
                             await archiveCard(card);
                         }
                     } else if (card.archived) {
+                        // PR updated, so restore it from the archive
                         console.log(`Restoring Card from archive`);
                         await unarchiveCard(card);
                     }
-
-                    return;
+                } else {
+                    // Card doesn't exist
+                    console.log(`Creating new Card in ${project.name} (${targetColumn.name})`);
+                    await github.projects.createCard({
+                        column_id: targetColumn.id,
+                        content_id: pr.id,
+                        content_type: 'PullRequest',
+                    });
                 }
-
-                // Create a new card
-                console.log(`Creating new Card in ${project.name} (${targetColumn.name})`);
-                await github.projects.createCard({
-                    column_id: targetColumn.id,
-                    content_id: pr.id,
-                    content_type: 'PullRequest',
-                });
             });
