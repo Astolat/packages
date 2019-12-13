@@ -149,12 +149,15 @@ jobs:
 
             await sequence(projects, async (project) => {
                 const columns = await getColumns(project);
-                const [card] = await sequence(columns, getCards);
+                const cardResult = await sequence(columns, getCards);
+                const [card] = uniq(flatten(cardResult));
+
 
                 console.dir({
                     project,
                     columns,
                     card,
+                    cardResult,
                 }, {
                     colors: true,
                     depth: 3,
