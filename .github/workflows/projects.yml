@@ -46,11 +46,6 @@ jobs:
             const packages = ${{ env.packages }};
             const changed = ${{ env.changed }};
 
-            console.dir(pr, {
-              colors: true,
-              depth: 1,
-            });
-
             const mapKeys = (arr, key = 'name') => (
                 uniq(flatten(arr).map(item => item[key]))
             );
@@ -122,15 +117,9 @@ jobs:
                     column_id: column.id,
                 }).then(({ data }) => data);
 
-                console.dir({
-                  column,
-                  existingCards,
-                });
-
                 const cards = existingCards
                     .filter(card => (
-                        card.content_id == pr.id &&
-                        card.content_type === 'PullRequest'
+                        card.content_url === pr.issue_url
                     ))
                     .map(card => ({
                         ...card,
@@ -167,15 +156,6 @@ jobs:
 
                 return 'Code Review';
             })();
-
-            console.dir({
-              projects,
-              allColumns,
-              allCards,
-            }, {
-              colors: true,
-              depth: 3,
-            });
 
             await sequence(projects, async (project) => {
                 const columns = allColumns
