@@ -1,4 +1,4 @@
-name: Update Projects
+name: Projects
 on:
   pull_request:
     types: [opened,synchronize,reopened,closed]
@@ -193,9 +193,7 @@ jobs:
                 const targetColumn = columns
                     .find(({ name }) => name === targetColumnName);
 
-                if (cards.length > 0) {
-                    const [card] = cards;
-
+                if (card) {
                     // There's an existing card
                     console.log(`Existing Card in ${project.name}`);
 
