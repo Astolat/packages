@@ -31,7 +31,7 @@ jobs:
       - name: Set variables
         run: |
           echo "::set-env name=yarn-cache::$(yarn cache dir)"
-          echo "::add-path::$(yarn global bin)"
+          echo "::add-path::$(pwd)/node_modules/.bin"
 
           git config --global user.name "$(git --no-pager log --format=format:'%an' -n 1)"
           git config --global user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
@@ -46,8 +46,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          yarn global add lerna
-          npm install $(node -p "Object.keys(require('./package.json').devDependencies).filter(pkg => pkg.includes('lerna')).join(' ')")
+          yarn install
 
       - name: Publish (latest)
         env:
