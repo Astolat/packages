@@ -46,6 +46,11 @@ jobs:
             const packages = ${{ env.packages }};
             const changed = ${{ env.changed }};
 
+            console.dir(pr, {
+                colors: true,
+                depth: 0,
+            });
+
             const mapKeys = (arr, key = 'name') => (
                 uniq(flatten(arr).map(item => item[key]))
             );
@@ -105,12 +110,6 @@ jobs:
                     }).then(({ data }) => data)
                 ));
 
-                columns.forEach((column) => {
-                    column.project = project;
-                });
-
-                project.columns = columns;
-
                 return columns;
             };
 
@@ -124,9 +123,6 @@ jobs:
                         card.content_url === pr.issue_url
                     ));
 
-                column.project.cards = column.project.cards || [];
-                column.project.cards.push(...cards);
-
                 return cards;
             };
 
@@ -138,12 +134,6 @@ jobs:
             );
 
             const projects = await getProjects();
-
-            const allColumns = await sequence(projects, getColumns)
-                .then(result => flatten(result));
-
-            const allCards = await sequence(allColumns, getCards)
-                .then(result => flatten(result));
 
             const targetColumnName = (() => {
                 if (eventAction === 'closed') {
@@ -158,10 +148,8 @@ jobs:
             })();
 
             await sequence(projects, async (project) => {
-                const {
-                    columns,
-                    cards: [card],
-                } = project;
+                const columns = await getColumns(project);
+                const [card] = await sequence(columns, getCards);
 
                 console.dir({
                     project,
