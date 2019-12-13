@@ -46,7 +46,7 @@ jobs:
             const packages = ${{ env.packages }};
             const changed = ${{ env.changed }};
 
-            const mapNames = (arr, key = 'name') => (
+            const mapKeys = (arr, key = 'name') => (
                 uniq(flatten(arr).map(item => item[key]))
             );
 
@@ -79,7 +79,7 @@ jobs:
                     ...context.issue,
                     state: 'all',
                 }).then(({ data }) => data);
-                const projectNames = uniq(flatten(mapNames(existingProjects), packages));
+                const projectNames = uniq(flatten(mapKeys(existingProjects), packages));
 
                 return await sequence(projectNames, projectName => (
                     existingProjects.find(({ name }) => name === projectName) ||
@@ -96,7 +96,7 @@ jobs:
                 const existingColumns = await github.projects.listColumns({
                     project_id: project.id,
                 }).then(({ data }) => data);
-                const columnNames = uniq(flatten(mapNames(existingColumns), requiredColumnNames));
+                const columnNames = uniq(flatten(mapKeys(existingColumns), requiredColumnNames));
                 const columns = await sequence(columnNames, columnName => (
                     existingColumns.find(({ name }) => name === columnName) ||
                     github.projects.createColumn({
@@ -169,7 +169,7 @@ jobs:
                     }) => (
                             projectId == project.id
                         ));
-                const columnIds = mapKey(columns, 'id');
+                const columnIds = mapKeys(columns, 'id');
                 const card = allCards
                     .find(({ column_id }) => (
                         columnIds.includes(column_id)
@@ -181,7 +181,6 @@ jobs:
                     card,
                 }, {
                     colors: true,
-                    depth: 100,
                 });
 
                 if (!changed.includes(project.name)) {
