@@ -109,6 +109,8 @@ jobs:
                     column.project = project;
                 });
 
+                project.columns = columns;
+
                 return columns;
             };
 
@@ -120,12 +122,10 @@ jobs:
                 const cards = existingCards
                     .filter(card => (
                         card.content_url === pr.issue_url
-                    ))
-                    .map(card => ({
-                        ...card,
-                        project: project.column,
-                        column,
-                    }));
+                    ));
+
+                column.project.cards = column.project.cards || [];
+                column.project.cards.push(...cards);
 
                 return cards;
             };
@@ -158,29 +158,18 @@ jobs:
             })();
 
             await sequence(projects, async (project) => {
-                const columns = allColumns
-                    .filter(({
-                        project: {
-                            id: projectId,
-                        },
-                    }) => (
-                            projectId == project.id
-                        ));
-                const columnIds = mapKeys(columns, 'id');
-                const card = allCards
-                    .find(({ column_id }) => (
-                        columnIds.some(id => (
-                          id == column_id
-                        ))
-                    ));
+                const {
+                    columns,
+                    cards: [card],
+                } = project;
 
                 console.dir({
-                  project,
-                  columns,
-                  card,
+                    project,
+                    columns,
+                    card,
                 }, {
-                  colors: true,
-                  depth: 3,
+                    colors: true,
+                    depth: 3,
                 });
 
                 if (!changed.includes(project.name)) {
