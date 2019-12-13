@@ -1,6 +1,7 @@
 name: Update Projects
 on:
   pull_request:
+    types: [opened,synchronize,reopened,closed]
     paths:
       - 'packages/**'
     branches:
@@ -42,64 +43,170 @@ jobs:
           script: |
             const eventAction = ${{ toJson(github.event.action) }};
             const pr = ${{ toJson(github.event.pull_request) }};
-            const projects = await github.projects.listForRepo({
-              ...context.issue,
-              state: 'all',
-            }).then(({ data }) => data);
-            const projectNames = projects.map(({ name }) => name);
             const packages = ${{ env.packages }};
-            const newProjectNames = packages
-              .filter(name => !projectNames.includes(name));
+            const changed = ${{ env.changed }};
 
-            const newProjects = await Promise.all(
-              newProjectNames.map(name => (
+            const mapNames = (arr, key = 'name') => (
+              uniq(flatten(arr).map(item => item[key]))
+            );
+
+            const flatten = (...arr) => (
+              arr.reduce((out, item) => ([
+                ...out,
+                ...(Array.isArray(item) ? flatten(...item) : [item]),
+              ]), [])
+            );
+
+            const uniq = (arr) => (
+              Array.from(new Set(arr))
+                .filter(item => !!item)
+            );
+
+            const sequence = (arr, func) => (
+              arr.reduce(async (promise, item) => {
+                const prev = await promise;
+                const result = await func(item);
+
+                return [
+                  ...prev,
+                  result,
+                ];
+              }, Promise.resolve([]))
+            );
+
+            const getProjects = async () => {
+              const existingProjects = await github.projects.listForRepo({
+                ...context.issue,
+                state: 'all',
+              }).then(({ data }) => data);
+              const projectNames = uniq(flatten(mapNames(existingProjects), packages));
+
+              return await sequence(projectNames, projectName => (
+                existingProjects.find(({ name }) => name === projectName) ||
                 github.projects.createForRepo({
                   ...context.issue,
-                  name,
+                  name: projectName,
                 }).then(({ data }) => data)
               ))
-            );
+            };
 
-            projects.push(...newProjects);
+            const requiredColumnNames = ['To Do', 'In Progress', 'Code Review', 'QA', 'Done'];
 
-            const columnName = eventAction === 'closed' ? 'Done' : 'In Progress';
-            const columns = await Promise.all(
-              projects.map(project => (
-                github.projects.listColumns({
+            const getColumns = async (project) => {
+              const existingColumns = await github.projects.listColumns({
+                project_id: project.id,
+              }).then(({ data }) => data);
+              const columnNames = uniq(flatten(mapNames(existingColumns), requiredColumnNames));
+              const columns = await sequence(columnNames, columnName => (
+                existingColumns.find(({ name }) => name === columnName) ||
+                github.projects.createColumn({
                   project_id: project.id,
-                })
-                  .then(({ data }) => data)
-                  .then(async (columns) => (
-                    columns.find(({ name }) => name === columnName) ||
-                    await github.projects.createColumn({
-                      project_id: project.id,
-                      name: columnName,
-                    }).then(({ data }) => data)
-                  ))
-                  .then(column => ({
-                    ...column,
-                    project,
-                  }))
-              ))
-            );
+                  name: columnName,
+                }).then(({ data }) => data)
+              ));
 
-            const changed = ${{ env.changed }};
-            const targetColumns = columns
-              .filter(({ project: { name } }) => changed.includes(name));
+              columns.forEach((column) => {
+                Object.assign(column, { project });
+              });
 
-            const cards = await Promise.all(
-              targetColumns.map(({ id }) => (
-                github.projects.listCards({
-                  column_id: id,
-                })
-                .then(({ data }) => data)
-                .then(async (cards) => (
-                  cards.find(({ content_url }) => content_url === pr.issue_url) ||
-                  await github.projects.createCard({
-                    column_id: id,
-                    content_id: pr.id,
-                    content_type: 'PullRequest',
-                  }).then(({ data }) => data)
+              Object.assign(project, { columns });
+
+              return columns;
+            };
+
+            const getCards = async (column) => {
+              const {
+                project,
+              } = column;
+              const existingCards = await github.projects.listCards({
+                column_id: column.id,
+              }).then(({ data }) => data);
+
+              const cards = existingCards
+                .filter(card => (
+                  card.content_id === pr.id &&
+                  card.content_type === 'PullRequest'
                 ))
-              ))
+                .map(card => ({
+                  ...card,
+                  project,
+                  column,
+                }));
+
+              Object.assign(column, { cards });
+              Object.assign(project, {
+                cards: [
+                  ...(project.cards || []),
+                  ...cards,
+                ],
+              });
+
+              return cards;
+            };
+
+            const archiveCard = card => (
+              github.projects.updateCard({
+                card_id: card.id,
+                archived: true,
+              })
             );
+
+            const projects = await getProjects();
+
+            const columns = await sequence(projects, getColumns)
+              .then(result => flatten(result));
+
+            const cards = await sequence(columns, getCards)
+              .then(result => flatten(result));
+
+            const targetColumnName = (() => {
+              if (eventAction === 'closed') {
+                return 'Done';
+              }
+
+              if (pr.draft) {
+                return 'In Progress';
+              }
+
+              return 'Code Review';
+            })();
+
+            await sequence(projects, async ({ cards, columns, ...project }) => {
+              if (!changed.includes(project.name)) {
+                // This project is untouched
+                await sequence(cards, archiveCard);
+                return;
+              }
+
+              const targetColumn = columns
+                .find(({ name }) => name === targetColumnName);
+
+              if (cards.length > 0) {
+                const [card, ...duplicateCards] = cards;
+
+                // Archive any duplicate cards
+                await sequence(duplicateCards, archiveCard);
+
+                // There's an existing card
+                if (card.column_id === targetColumn.id) {
+                  // The card is where it belongs
+                  return;
+                }
+
+                // Move card to the target column
+                await github.projects.moveCard({
+                  card_id: card.id,
+                  position: 'top',
+                  column_id: targetColumn.id,
+                });
+
+                return;
+              }
+
+              // Create a new card
+              await github.projects.createCard({
+                column_id: targetColumn.id,
+                content_id: pr.id,
+                content_type: 'PullRequest',
+              });
+            });

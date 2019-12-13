@@ -57,7 +57,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        command: [lint,test,build]
+        command: [lint,test,typecheck]
     steps:
       - name: Checkout ${{ github.head_ref }}
         uses: actions/checkout@v1.2.0
@@ -92,18 +92,27 @@ jobs:
         run: |
           CMD='${{ matrix.command }}'
           ARGS=''
+          FILES=`git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }} -- '***.[jt]s' '***.[jt]sx'`
+          COUNT=`echo ${FILES} | wc -l | tr -d '[:space:]'`
+
+          if [[ "${COUNT}" == "0" ]]; then
+            echo "Skipping ${{ matrix.command }} - No relevant changes"
+            exit 0
+          fi
+
+          echo "Running ${{ matrix.command }} for ${COUNT} file$([[ "${COUNT}" == '1' ]] && echo '' || echo 's')"
+          echo ${FILES} | sed 's/^/  /'
 
           case ${CMD} in
             lint)
               CMD='eslint'
-              ARGS=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }} -- '***.[jt]s' '***.[jt]sx')
-              [[ "${ARGS}" == "" ]] && exit 0
+              ARGS=${FILES}
               ;;
             test)
               ARGS='--changedSince origin/${{ github.base_ref }}'
               ;;
-            build)
-              ARGS='--since origin/${{ github.base_ref }}'
+            typecheck)
+              echo `node -p "JSON.stringify({ ...require('./tsconfig.json'), files: process.argv[1].trim().split(/[\r\n]+/g) })" "${FILES}"` > ./tsconfig.json
               ;;
           esac
 

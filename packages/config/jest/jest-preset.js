@@ -20,12 +20,15 @@ const hasPkg = (...names) => {
 const workspacesConfig = Object.entries(process.env)
 	.reduce(
 		(values, [key, val]) => {
-		if ((/^npm_package_workspaces_[0-9]+$/i).test(key)) {
+		if (
+			(/^npm_package_workspaces_[0-9]+$/i).test(key) &&
+			typeof val === 'string'
+		) {
 			values.push(val);
 		}
 
 		return values;
-	}, []);
+	}, /** @type {string[]} */ ([]));
 const hasWorkspaces = workspacesConfig.length > 0;
 const hasWorkspacesWatch = hasWorkspaces && hasPkg('jest-watch-yarn-workspaces');
 const packages = hasWorkspaces && glob(
@@ -55,7 +58,6 @@ module.exports = {
 			rootDir: path.join(process.cwd(), dirname),
 			transform: {
 				'\\.tsx?$': 'ts-jest',
-				'\\.jsx?$': 'babel-jest',
 			},
 			setupFiles: [
 				path.join(__dirname, 'jest-setup.js'),
