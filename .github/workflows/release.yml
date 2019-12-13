@@ -63,4 +63,5 @@ jobs:
             --create-release github \
             --message 'chore(release): publish' \
             --changelog-preset conventionalcommits \
+            --no-commit-hooks \
             --yes
