@@ -63,4 +63,5 @@ jobs:
             --create-release github \
             --amend \
             --changelog-preset conventionalcommits \
+            --no-commit-hooks \
             --yes
