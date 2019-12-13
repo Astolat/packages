@@ -117,6 +117,12 @@ jobs:
                     column_id: column.id,
                 }).then(({ data }) => data);
 
+                console.dir({
+                  column,
+                  existingCards,
+                  'pr.id': pr.id,
+                });
+
                 const cards = existingCards
                     .filter(card => (
                         card.content_id == pr.id &&
@@ -127,8 +133,6 @@ jobs:
                         project: project.column,
                         column,
                     }));
-
-                column.cards = cards;
 
                 return cards;
             };
