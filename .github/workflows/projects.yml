@@ -175,14 +175,6 @@ jobs:
                         columnIds.includes(column_id)
                     ));
 
-                console.dir({
-                    project,
-                    columns,
-                    card,
-                }, {
-                    colors: true,
-                });
-
                 if (!changed.includes(project.name)) {
                     // This project is untouched
                     console.log(`Existing Card doesn't belong in ${project.name}`);
