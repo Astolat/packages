@@ -79,7 +79,7 @@ jobs:
                 ...context.issue,
                 state: 'all',
               }).then(({ data }) => data);
-              const projectNames = uniq(flatten(mapNames(existingProjects), mapNames(packages)));
+              const projectNames = uniq(flatten(mapNames(existingProjects), packages));
 
               console.log('projectNames', projectNames);
 
