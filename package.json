@@ -5,9 +5,11 @@
     "packages/**"
   ],
   "version": "1.0.0",
-  "repository": "https://github.com/astolat/main",
+  "description": "",
   "author": "Astolat LLC <dev@astolat.com>",
   "license": "MIT",
+  "repository": "https://github.com/astolat/main",
+  "bugs": "https://github.com/Astolat/main/issues",
   "scripts": {
     "commit": "commit",
     "test": "jest",

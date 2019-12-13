@@ -1,14 +1,22 @@
 {
 	"name": "@astolat/eslint-config",
 	"version": "0.0.2",
+	"description": "",
+	"main": "index.js",
+	"author": "Astolat LLC <dev@astolat.com>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Astolat/main.git",
+		"directory": "packages/config/eslint"
+	},
 	"publishConfig": {
 		"access": "public"
 	},
-	"license": "MIT",
-	"main": "index.js",
 	"peerDependencies": {
 		"eslint": "^6.7.2"
 	},
+	"bugs": "https://github.com/Astolat/main/issues?q=is:issue+project:@astolat/eslint-config",
 	"dependencies": {
 		"@typescript-eslint/eslint-plugin": "^2.11.0",
 		"@typescript-eslint/parser": "^2.11.0",
