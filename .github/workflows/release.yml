@@ -17,8 +17,15 @@ jobs:
           ref: ${{ github.base_ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Read .nvmrc
+      - name: Configure
         run: |
+          git config --global user.name "$(git --no-pager log --format=format:'%an' -n 1)"
+          git config --global user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git checkout -B ${{ github.base_ref }}
+
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+
           echo "::set-env name=node-version::$(cat ./.nvmrc)"
 
       - name: Setup Node.js v${{ env.node-version }}
@@ -32,11 +39,6 @@ jobs:
         run: |
           echo "::set-env name=yarn-cache::$(yarn cache dir)"
           echo "::add-path::$(pwd)/node_modules/.bin"
-
-          git config --global user.name "$(git --no-pager log --format=format:'%an' -n 1)"
-          git config --global user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git checkout -B ${{ github.base_ref }}
 
       - name: Restore yarn cache
         uses: actions/cache@v1.0.3
