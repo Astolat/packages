@@ -124,7 +124,7 @@ jobs:
 
               const cards = existingCards
                 .filter(card => (
-                  card.content_id === pr.id &&
+                  card.content_id == pr.id &&
                   card.content_type === 'PullRequest'
                 ))
                 .map(card => ({
