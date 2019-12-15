@@ -8,7 +8,7 @@ on:
       - 'packages/**'
       - 'yarn.lock'
       - 'tsconfig.json'
-      - '.github/workflows/release'
+      - '.github/workflows/release.yml'
       - '!**.spec.*'
       - '!**.md'
 
