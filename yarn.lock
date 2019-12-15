@@ -3,7 +3,7 @@
 
 
 "@astolat/eslint-config@file:packages/config/eslint":
-  version "0.0.0"
+  version "0.0.4"
   dependencies:
     "@typescript-eslint/eslint-plugin" "^2.11.0"
     "@typescript-eslint/parser" "^2.11.0"
@@ -13,13 +13,16 @@
     eslint-plugin-react-hooks "^2.3.0"
 
 "@astolat/jest-config@file:packages/config/jest":
-  version "0.0.0"
+  version "0.0.4"
   dependencies:
     globby "^10.0.1"
     ts-jest "^24.2.0"
 
-"@astolat/utils@file:packages/utils":
+"@astolat/ts-config@file:packages/config/ts":
   version "0.0.0"
+
+"@astolat/utils@file:packages/utils":
+  version "0.0.4"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.5.5":
   version "7.5.5"
