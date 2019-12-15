@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.head_ref }}
-        uses: actions/checkout@v1.2.0
+        uses: actions/checkout@v2
 
       - name: Read .nvmrc
         run: |
@@ -30,6 +30,16 @@ jobs:
 
       - name: Validate commit messages
         run: |
-          commitlint \
-            --from origin/master \
-            --to ${{ github.event.after }}
+          IFS=$'\n'
+          messages=($(node -p << EOF
+            ${{ toJson(github.event.commits.*.message) }}.join('\n');
+          EOF))
+          unset IFS
+
+          echo "linting ${#messages[@]} commits"
+
+          for msg in "${messages[@]}"
+          do
+            echo "  • ${msg}"
+            echo "${msg}" | commitlint
+          done
