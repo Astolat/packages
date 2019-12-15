@@ -1,13 +1,20 @@
 {
   "command": {
     "publish": {
+      "npmClient": "npm",
+      "registry": "https://registry.npmjs.org/"
+    },
+    "version": {
+      "conventionalCommits": true,
+      "changelogPreset": "conventionalcommits",
+      "allowBranch": "master",
+      "exact": true,
+      "includeMergedTags": true,
+      "message": "chore(release): publish",
       "ignoreChanges": [
         "*.md",
         "*.spec.*"
-      ],
-      "npmClient": "npm",
-      "registry": "https://registry.npmjs.org/",
-      "conventionalCommits": true
+      ]
     },
     "bootstrap": {
       "forceLocal": true,
