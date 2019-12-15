@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.0.4 (2019-12-15)</small>
+
+* ci(release): don't need to merge in merged branch ([3671bb4](https://github.com/Astolat/main/commit/3671bb4))
+
+
+
+
+
 ## <small>0.0.3 (2019-12-13)</small>
 
 * Merge pull request #23 from Astolat/lmiller/github-actions ([1f3b32f](https://github.com/Astolat/main/commit/1f3b32f)), closes [#23](https://github.com/Astolat/main/issues/23)
