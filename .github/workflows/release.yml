@@ -4,29 +4,40 @@ on:
     branches:
       - master
     types: [closed]
+    paths:
+      - 'packages/**'
+      - 'yarn.lock'
+      - 'tsconfig.json'
+      - '.github/workflows/release'
+      - '!**.spec.*'
+      - '!**.md'
 
 jobs:
   release:
-    name: Release
+    name: Publish
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
       - name: Checkout ${{ github.base_ref }}
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v2
         with:
           ref: ${{ github.base_ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Merge in ${{ github.head_ref }}
+        run: |
+          git config --local user.name "$(git --no-pager log --format=format:'%an' -n 1)"
+          git config --local user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+          git pull origin ${{ github.head_ref }}
+          git fetch --depth=1 --tags origin
+
       - name: Configure
         run: |
-          git config --global user.name "$(git --no-pager log --format=format:'%an' -n 1)"
-          git config --global user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git checkout -B ${{ github.base_ref }}
-
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
-
           echo "::set-env name=node-version::$(cat ./.nvmrc)"
+          echo "::add-path::$(pwd)/node_modules/.bin"
 
       - name: Setup Node.js v${{ env.node-version }}
         uses: actions/setup-node@v1.3.0
@@ -34,17 +45,6 @@ jobs:
           node-version: ${{ env.node-version }}
           scope: ${{ env.scope }}
           registry-url: ${{ env.registry-url }}
-
-      - name: Set variables
-        run: |
-          echo "::set-env name=yarn-cache::$(yarn cache dir)"
-          echo "::add-path::$(pwd)/node_modules/.bin"
-
-      - name: Restore yarn cache
-        uses: actions/cache@v1.0.3
-        with:
-          path: ${{ env.yarn-cache }}
-          key: yarn-cache-${{ hashFiles('yarn.lock') }}
 
       - name: Install dependencies
         run: |
@@ -60,8 +60,6 @@ jobs:
         run: |
           lerna publish \
             --no-verify-access \
-            --create-release github \
-            --message 'chore(release): publish' \
-            --changelog-preset conventionalcommits \
             --no-commit-hooks \
+            --create-release github \
             --yes
