@@ -21,19 +21,16 @@ jobs:
       - name: Checkout ${{ github.base_ref }}
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.base_ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: Merge in ${{ github.head_ref }}
+      - name: Configure
         run: |
           git config --local user.name "$(git --no-pager log --format=format:'%an' -n 1)"
           git config --local user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git fetch --tags origin
 
-          git fetch --depth=1 --tags origin
-
-      - name: Configure
-        run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
           echo "::set-env name=node-version::$(cat ./.nvmrc)"
           echo "::add-path::$(pwd)/node_modules/.bin"
@@ -51,13 +48,13 @@ jobs:
 
       - name: Publish (latest)
         env:
-          CI: true
           NODE_ENV: production
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           lerna publish \
+            --loglevel silly \
             --no-verify-access \
             --no-commit-hooks \
             --create-release github \
