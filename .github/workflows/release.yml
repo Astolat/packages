@@ -55,7 +55,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           lerna publish \
-            --loglevel silly \
             --no-verify-access \
             --no-commit-hooks \
             --create-release github \
