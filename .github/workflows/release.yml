@@ -30,7 +30,6 @@ jobs:
           git config --local user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
-          git pull origin ${{ github.head_ref }}
           git fetch --depth=1 --tags origin
 
       - name: Configure
