@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.0.5 (2019-12-15)</small>
+
+* ci(utils): use new tsconfig package ([0bd0a09](https://github.com/Astolat/main/commit/0bd0a09))
+
+
+
+
+
 ## <small>0.0.4 (2019-12-15)</small>
 
 * ci(release): don't need to merge in merged branch ([3671bb4](https://github.com/Astolat/main/commit/3671bb4))

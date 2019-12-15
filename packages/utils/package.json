@@ -1,6 +1,6 @@
 {
   "name": "@astolat/utils",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "dist/index.js",
   "author": "Astolat LLC <dev@astolat.com>",
@@ -19,6 +19,6 @@
   },
   "bugs": "https://github.com/Astolat/main/issues?q=is:issue+project:@astolat/utils",
   "devDependencies": {
-    "@astolat/ts-config": "^0.0.0"
+    "@astolat/ts-config": "0.1.0"
   }
 }
