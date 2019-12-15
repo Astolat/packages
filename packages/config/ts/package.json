@@ -1,0 +1,26 @@
+{
+  "name": "@astolat/ts-config",
+  "version": "0.0.0",
+  "description": "",
+  "main": "tsconfig.json",
+  "author": "Astolat LLC <dev@astolat.com>",
+  "license": "MIT",
+  "keywords": [
+    "tsconfig",
+    "typescript",
+    "ts",
+    "config"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Astolat/main.git",
+    "directory": "packages/config/ts"
+  },
+  "bugs": "https://github.com/Astolat/main/issues?q=is:issue+project:@astolat/ts-config",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "tsconfig.json"
+  ]
+}
