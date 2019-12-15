@@ -4,6 +4,7 @@ on:
     types: [opened,synchronize,reopened,closed]
     paths:
       - 'packages/**'
+      - '.github/workflows/projects.yml'
     branches:
       - master
 
@@ -13,12 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.head_ref }}
-        uses: actions/checkout@v1.2.0
-        with:
-          fetch-depth: 1
+        uses: actions/checkout@v2
 
-      - name: Read .nvmrc
+      - name: Configure
         run: |
+          git fetch --depth=1 origin ${{ github.base_ref }}
           echo "::set-env name=node-version::$(cat ./.nvmrc)"
 
       - name: Setup Node.js v${{ env.node-version }}
@@ -155,8 +155,12 @@ jobs:
 
                 if (!changed.includes(project.name)) {
                     // This project is untouched
-                    console.log(`Existing Card doesn't belong in ${project.name}`);
-                    await archiveCard(card);
+                    if (card) {
+                        // archive the existing Card
+                        console.log(`Existing Card doesn't belong in ${project.name}`);
+                        await archiveCard(card);
+                    }
+
                     return;
                 }
 
