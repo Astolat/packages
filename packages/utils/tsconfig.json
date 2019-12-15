@@ -1,10 +1,9 @@
 {
-	"extends": "../../tsconfig.json",
-	"include": [
-		"./src"
-	],
+	"extends": "@astolat/ts-config",
 	"compilerOptions": {
-		"outDir": "./dist",
-		"baseUrl": "./"
-	}
+		"outDir": "dist"
+	},
+	"include": [
+		"src/**.ts"
+	]
 }

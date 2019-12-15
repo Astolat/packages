@@ -17,5 +17,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "bugs": "https://github.com/Astolat/main/issues?q=is:issue+project:@astolat/utils"
+  "bugs": "https://github.com/Astolat/main/issues?q=is:issue+project:@astolat/utils",
+  "devDependencies": {
+    "@astolat/ts-config": "^0.0.0"
+  }
 }
