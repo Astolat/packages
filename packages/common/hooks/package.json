@@ -1,0 +1,29 @@
+{
+  "name": "@astolat/hooks",
+  "version": "0.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "author": "Astolat LLC <dev@astolat.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Astolat/main.git",
+    "directory": "packages/common/hooks"
+  },
+  "scripts": {
+    "build": "tsc -p ./tsconfig.build.json",
+    "prepublish": "yarn build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bugs": "https://github.com/Astolat/main/issues?q=is:issue+project:@astolat/hooks",
+  "devDependencies": {
+    "@astolat/ts-config": "^0.0.0",
+    "@types/react": "^16.9.17",
+    "react": "^16.12.0"
+  },
+  "peerDependencies": {
+    "react": "^16.12.0"
+  }
+}
