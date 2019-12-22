@@ -1,4 +1,0 @@
-src/
-.*rc
-jest.config.js
-tsconfig.*

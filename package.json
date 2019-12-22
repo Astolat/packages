@@ -36,7 +36,6 @@
   "dependencies": {
     "@astolat/eslint-config": "file:packages/config/eslint",
     "@astolat/jest-config": "file:packages/config/jest",
-    "@astolat/ts-config": "file:packages/config/ts",
-    "@astolat/utils": "file:packages/utils"
+    "@astolat/ts-config": "file:packages/config/ts"
   }
 }
