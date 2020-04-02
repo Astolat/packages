@@ -1,6 +1,12 @@
 {
-	"extends": "@astolat/ts-config",
 	"compilerOptions": {
 		"noEmit": true
-	}
+	},
+	"extends": "@astolat/ts-config",
+	"include": [
+		"**/*.ts",
+		"**/*.tsx",
+		"**/*.js",
+		"**/*.jsx"
+	]
 }

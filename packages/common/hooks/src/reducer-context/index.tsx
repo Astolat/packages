@@ -2,155 +2,104 @@ import React, {
 	createContext,
 	useContext,
 	useReducer,
-	useMemo,
+	useRef,
 } from 'react';
 
 
-type ActionDefinition<T extends object = {}> = {
-	[type: string]: (state: T, ...payload: any[]) => T;
+type ActionState = {
+	[key: string]: any;
 };
 
-type ActionState<A extends ActionDefinition> = A extends ActionDefinition<infer T> ? T : never;
-type ActionType<A extends ActionDefinition> = keyof A;
-type ActionPayload<A extends ActionDefinition, T extends ActionType<A> = ActionType<A>> = {
-	[type in ActionType<A>]: A[type] extends ((s: ActionState<A>, ...p: infer P) => ActionState<A>)
-		? Parameters<(...payload: P) => any>
-		: Parameters<A[type]>
+type ActionReducer<S extends ActionState> = (state: S, ...payload: any[]) => S;
+
+type ActionDefinition<S extends ActionState> = {
+	[type: string]: ActionReducer<S>;
+};
+
+type ActionType<A extends ActionDefinition<S>, S extends ActionState> = keyof A & string;
+
+type ActionPayload<A extends ActionDefinition<S>, S extends ActionState, T extends ActionType<A, S> = ActionType<A, S>> = {
+	[type in ActionType<A, S>]: A[type] extends ((state: S, ...p: infer P) => S)
+		? P
+		: []
 }[T];
 
-type Action<A extends ActionDefinition, T extends ActionType<A> = ActionType<A>> = {
-	[type in ActionType<A>]: {
+type Action<A extends ActionDefinition<S>, S extends ActionState, T extends ActionType<A, S> = ActionType<A, S>> = {
+	[type in ActionType<A, S>]: {
 		type: type;
-		payload: ActionPayload<A, type>;
+		payload: ActionPayload<A, S, type>;
 	};
 }[T];
 
-type Actions<A extends ActionDefinition> = {
-	/**
-	 * Some comment
-	 */
-	[type in ActionType<A>]: (...payload: ActionPayload<A, type>) => void;
+type Actions<A extends ActionDefinition<S>, S extends ActionState> = {
+	[type in ActionType<A, S>]: (...payload: ActionPayload<A, S, type>) => void;
 };
 
+type ReducerContextConsumerProps<A extends ActionDefinition<S>, S extends ActionState> = {
+	children: (state: S, actions: Actions<A, S>) => React.ReactElement;
+};
+
+type ReducerContextProviderProps<A extends ActionDefinition<S>, S extends ActionState> = {
+	value?: Partial<S>;
+};
+
+type ReducerContextAPI<A extends ActionDefinition<S>, S extends ActionState> = {
+	Consumer: React.FunctionComponent<ReducerContextConsumerProps<A, S>>;
+	Provider: React.FunctionComponent<ReducerContextProviderProps<A, S>>;
+	useReducerContext: () => [S, Actions<A, S>];
+};
+
+const REF_VALUE = Symbol('REF_VALUE');
+
+export function useConst<F extends () => any, T extends ReturnType<F>>(func: F): T {
+	const ref = useRef<T>(REF_VALUE as T);
+
+	if (ref.current === REF_VALUE) {
+		ref.current = func();
+	}
+
+	return ref.current;
+}
 
 /**
  * Create a new `React.Context` with a built-in reducer.
  *
  * @param actions A map of action reducer functions
  * @param initialState The initial values of the context state
- *
- * ### Example
- * #### **`context.ts`**
- * ```ts
- * type State = {
- * 	currentValue: number;
- * 	previousValue?: number;
- * };
- *
- * const initialState: State = {
- * 	currentValue: 0,
- * };
- *
- * const actions = {
- * 	add: (state: State, num: number = 1): State => ({
- * 		...state,
- * 		currentValue: state.currentValue + num,
- * 		previousValue: state.currentValue,
- * 	}),
- * 	subtract: (state: State, num: number = 1): State => ({
- * 		...state,
- * 		currentValue: state.currentValue - num,
- * 		previousValue: state.currentValue,
- * 	}),
- * 	multiply: (state: State, num: number): State => ({
- * 		...state,
- * 		currentValue: state.currentValue * num,
- * 		previousValue: state.currentValue,
- * 	}),
- * 	undo: (state: State): State => ({
- * 		...state,
- * 		currentValue: state.previousValue,
- * 		previousValue: state.currentValue,
- * 	}),
- * };
- *
- * const {
- * 	useReducerContext,
- * 	Provider,
- * } = createReducerContext(actions, initialState);
- *
- * export {
- * 	useReducerContext,
- * 	Provider,
- * };
- * ```
- * #### **`some-component.tsx`**
- * ```tsx
- * function SomeComponent() {
- * 	const [
- * 		{
- * 			currentValue,
- * 		},
- * 		{
- * 			add,
- * 			subtract,
- * 			multiply,
- * 			undo,
- * 		},
- * 	] = useReducerContext();
- *
- * 	return (
- * 		<div>
- * 			<h1>Current Value: { currentValue }</h1>
- * 			<button onClick={ () => add() }>+1</button>
- * 			<button onClick={ () => add(10) }>+10</button>
- * 			<button onClick={ () => subtract(1) }>-1</button>
- * 			<button onClick={ () => subtract(10) }>-10</button>
- * 			<button onClick={ () => subtract(10) }>x10</button>
- * 			<button onClick={ () => subtract(100) }>x100</button>
- * 			<button onClick={ () => undo() }>Undo</button>
- * 		</div>
- * 	);
- * }
- * ```
  */
-export function createReducerContext<T extends object, A extends ActionDefinition<T>>(actions: A, initialState: T = {} as T) {
-	const reducer: React.Reducer<T, Action<A>> = (state, action): T => {
-		const {
-			type,
-			payload,
-		} = action;
-
+export function createReducerContext<A extends ActionDefinition<S>, S extends ActionState>(actions: A, initialState: S): ReducerContextAPI<A, S> {
+	const reducer: React.Reducer<S, Action<A, S>> = (state, { type, payload }): S => {
 		if (actions[type] instanceof Function) {
-			return {
-				...(actions[type](state, ...payload) || state),
-			};
+			return actions[type](state, ...payload) || state;
 		}
 
 		return state;
 	};
 
 	const StateContext = createContext(initialState);
-	const ActionContext = createContext<Actions<A>>({} as Actions<A>);
+	const ActionContext = createContext({} as Actions<A, S>);
 
-	const useReducerContext = (): [T, Actions<A>] => [
+	const useReducerContext: ReducerContextAPI<A, S>['useReducerContext'] = () => [
 		useContext(StateContext),
 		useContext(ActionContext),
 	];
 
-	function ReducerContextProvider(props: React.ProviderProps<T>) {
-		const {
-			value,
-			children,
-		} = props;
-		const [state, dispatch] = useReducer(reducer, value);
-		const actionState = useMemo(() => (
+	const Consumer: ReducerContextAPI<A, S>['Consumer'] = ({
+		children,
+	}) => children(...useReducerContext());
+
+	const Provider: ReducerContextAPI<A, S>['Provider'] = ({
+		value,
+		children,
+	}) => {
+		const [state, dispatch] = useReducer(reducer, { ...initialState, ...value });
+		const actionState = useConst(() => (
 			Object.keys(actions)
-				.reduce<Actions<A>>((funcs: Actions<A>, type: ActionType<A>) => ({
+				.reduce((funcs, type) => ({
 					...funcs,
-					[type]: (...payload: ActionPayload<A>) => dispatch({ type, payload }),
-				}), {} as Actions<A>)
-		), []);
+					[type]: (...payload: ActionPayload<A, S>): void => dispatch({ type, payload }),
+				}), {} as Actions<A, S>)
+		));
 
 		return (
 			<StateContext.Provider
@@ -162,11 +111,12 @@ export function createReducerContext<T extends object, A extends ActionDefinitio
 					{ children }
 				</ActionContext.Provider>
 			</StateContext.Provider>
-		)
-	}
+		);
+	};
 
 	return {
+		Consumer,
+		Provider,
 		useReducerContext,
-		Provider: ReducerContextProvider,
 	};
 }

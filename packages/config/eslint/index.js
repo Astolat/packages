@@ -67,6 +67,7 @@ module.exports = {
 	rules: {
 		'react-hooks/rules-of-hooks': ERROR,
 		'react-hooks/exhaustive-deps': WARN,
+		'react/prop-types': OFF,
 
 		'comma-dangle': [ERROR, {
 			arrays: 'always-multiline',

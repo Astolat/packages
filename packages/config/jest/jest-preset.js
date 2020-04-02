@@ -31,6 +31,16 @@ const workspacesConfig = Object.entries(process.env)
 	}, /** @type {string[]} */ ([]));
 const hasWorkspaces = workspacesConfig.length > 0;
 const hasWorkspacesWatch = hasWorkspaces && hasPkg('jest-watch-yarn-workspaces');
+const hasReact = hasPkg('react');
+const reactVersion = hasReact && (
+	require('react/package.json').version.split('.')[0]
+);
+const hasEnzyme = (
+	hasReact &&
+	hasPkg('jest-enzyme') &&
+	hasPkg('jest-environment-enzyme') &&
+	hasPkg(`enzyme-adapter-react-${ reactVersion }`)
+);
 const packages = hasWorkspaces && glob(
 	workspacesConfig.map(pattern => path.join(pattern, 'package.json')),
 	{
@@ -49,6 +59,14 @@ const packages = hasWorkspaces && glob(
 		[require(pkgJson).name]: path.dirname(path.relative(process.cwd(), pkgJson)),
 	}), {});
 const isProd = process.env.NODE_ENV === 'production';
+
+console.dir({
+	hasWorkspaces,
+	hasReact,
+	hasEnzyme,
+}, {
+	colors: true,
+});
 
 module.exports = {
 	...(hasWorkspaces && {
@@ -70,6 +88,13 @@ module.exports = {
 			],
 			timers: 'fake',
 			testURL: 'http://astolat.com',
+			...(hasEnzyme && {
+				setupFilesAfterEnv: ['jest-enzyme'],
+				testEnvironment: 'enzyme',
+				testEnvironmentOptions: {
+					enzymeAdapter: `react${ reactVersion }`,
+				},
+			}),
 		})),
 	}),
 	...(hasWorkspacesWatch && {

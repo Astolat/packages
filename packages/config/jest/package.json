@@ -24,12 +24,28 @@
   ],
   "bugs": "https://github.com/Astolat/main/issues?q=is:issue+project:@astolat/jest-config",
   "peerDependencies": {
+    "enzyme": "^3.11.0",
     "jest": "^24.9.0",
+    "jest-environment-enzyme": "^7.1.2",
+    "jest-enzyme": "^7.1.2",
     "jest-watch-yarn-workspaces": "^1.1.0",
+    "jsdom": "^15.2.1",
     "typescript": "^3.7.3"
   },
   "peerDependenciesMeta": {
+    "enzyme": {
+      "optional": true
+    },
+    "jest-environment-enzyme": {
+      "optional": true
+    },
+    "jest-enzyme": {
+      "optional": true
+    },
     "jest-watch-yarn-workspaces": {
+      "optional": true
+    },
+    "jsdom": {
       "optional": true
     }
   },

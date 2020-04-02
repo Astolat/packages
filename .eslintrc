@@ -4,5 +4,8 @@
 	],
 	"parserOptions": {
 		"project": "./tsconfig.json"
+	},
+	"rules": {
+		"react/prop-types": 0
 	}
 }
