@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 
 
-type AjaxStatus = {
+interface AjaxStatus {
 	abort?: AbortController['abort'];
 	error?: boolean;
 	loading: boolean;
@@ -17,8 +17,11 @@ type AjaxStatus = {
 	success?: boolean;
 }
 
+interface AjaxState<T> extends AjaxStatus {
+	data?: T;
+}
 
-function useAjax<T extends any = {}>(...args: Parameters<typeof fetch>): [T, AjaxStatus] {
+function useAjax<T = {}>(...args: Parameters<typeof fetch>): [T|void, AjaxStatus] {
 	const [input, init = {}] = args;
 	const controller = useMemo(() => (
 		new AbortController()
@@ -35,7 +38,7 @@ function useAjax<T extends any = {}>(...args: Parameters<typeof fetch>): [T, Aja
 		response,
 		status,
 		success,
-	}, setData] = useState<{ data?: T } & AjaxStatus>({
+	}, setData] = useState<AjaxState<T>>({
 		loading: true,
 	});
 
@@ -86,7 +89,7 @@ type AjaxContextConsumerProps<T extends object = {}> = {
 	children: (data: T, status?: AjaxStatus) => React.ReactNode;
 };
 
-export function createAjaxContext<T extends object = {}>(initialState: T = null as T) {
+export function createAjaxContext<T extends object = {}>(initialState: T = {} as T) {
 	const DataContext = createContext<T>(initialState);
 	const StatusContext = createContext<AjaxStatus>({
 		loading: true,

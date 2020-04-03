@@ -1,6 +1,14 @@
 {
 	"compilerOptions": {
-		"noEmit": true
+		"noEmit": true,
+		"sourceMap": true,
+		"declaration": true,
+		"declarationMap": true,
+		"esModuleInterop": true,
+		"useDefineForClassFields": true,
+		"skipLibCheck": true,
+		"pretty": true,
+		"moduleResolution": "node"
 	},
 	"extends": "@astolat/ts-config",
 	"include": [
