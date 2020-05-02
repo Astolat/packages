@@ -1,0 +1,28 @@
+{
+	"name": "@astolat/form",
+	"version": "0.0.0",
+	"description": "",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"author": "Astolat LLC <dev@astolat.com>",
+	"license": "MIT",
+	"repository": {
+	  "type": "git",
+	  "url": "https://github.com/Astolat/main.git",
+	  "directory": "packages/components/form"
+	},
+	"scripts": {
+	  "build": "tsc -p ./tsconfig.build.json",
+	  "prepublish": "yarn build"
+	},
+	"publishConfig": {
+	  "access": "public"
+	},
+	"bugs": "https://github.com/Astolat/main/issues?q=is:issue+project:@astolat/form",
+	"dependencies": {
+		"@astolat/context": "^0.0.0"
+	},
+	"peerDependencies": {
+	  "react": "^16.13.1"
+	}
+  }

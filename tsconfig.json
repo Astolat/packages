@@ -1,20 +1,19 @@
 {
-	"compilerOptions": {
-		"noEmit": true,
-		"sourceMap": true,
-		"declaration": true,
-		"declarationMap": true,
-		"esModuleInterop": true,
-		"useDefineForClassFields": true,
-		"skipLibCheck": true,
-		"pretty": true,
-		"moduleResolution": "node"
-	},
-	"extends": "@astolat/ts-config",
-	"include": [
-		"**/*.ts",
-		"**/*.tsx",
-		"**/*.js",
-		"**/*.jsx"
-	]
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@astolat/*": [
+                "packages/common/*/src",
+                "packages/components/*/src",
+                "packages/config/*/src"
+            ]
+        }
+    },
+    "extends": "@astolat/ts-config",
+    "include": [
+        "**/src/**/*.ts",
+        "**/src/**/*.tsx",
+        "**/src/**/*.js",
+        "**/src/**/*.jsx"
+    ]
 }

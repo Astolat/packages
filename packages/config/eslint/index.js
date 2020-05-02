@@ -1,8 +1,7 @@
 const path = require('path');
-const [OFF,WARN,ERROR] = [0,1,2];
+const [OFF, WARN, ERROR] = [0,1,2];
 
 module.exports = {
-	parser: '@typescript-eslint/parser',
 	parserOptions: {
 		ecmaVersion: 2020,
 		project: path.join(process.cwd(), 'tsconfig.json'),
@@ -20,7 +19,6 @@ module.exports = {
 		'**/dist/**',
 	],
 	plugins: [
-		'@typescript-eslint',
 		'jest',
 		'react',
 		'react-hooks',
@@ -56,12 +54,28 @@ module.exports = {
 		},
 		{
 			files: ['*.ts', '*.tsx'],
+			parser: '@typescript-eslint/parser',
 			extends: [
 				'plugin:@typescript-eslint/eslint-recommended',
 				'plugin:@typescript-eslint/recommended',
 				'plugin:@typescript-eslint/recommended-requiring-type-checking',
 				'plugin:import/typescript',
 			],
+			plugins: [
+				'@typescript-eslint',
+			],
+			settings: {
+				'import/parsers': {
+					'@typescript-eslint/parser': ['.ts', '.tsx'],
+				},
+				'import/resolver': {
+					typescript: {
+						directory: [
+							'packages/**/tsconfig.json',
+						],
+					},
+				},
+			},
 		},
 	],
 	rules: {
@@ -77,5 +91,6 @@ module.exports = {
 		}],
 		'quotes': [ERROR, 'single', { allowTemplateLiterals: true }],
 		'sort-imports': OFF,
+		'@typescript-eslint/explicit-function-return-type': OFF,
 	},
 };

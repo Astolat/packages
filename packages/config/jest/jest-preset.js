@@ -17,18 +17,22 @@ const hasPkg = (...names) => {
 	}
 };
 
-const workspacesConfig = Object.entries(process.env)
-	.reduce(
-		(values, [key, val]) => {
-		if (
-			(/^npm_package_workspaces_[0-9]+$/i).test(key) &&
-			typeof val === 'string'
-		) {
-			values.push(val);
-		}
+const {
+	workspaces: workspacesConfig,
+} = require(path.join(process.cwd(), 'package.json'));
 
-		return values;
-	}, /** @type {string[]} */ ([]));
+// const workspacesConfig = Object.entries(process.env)
+// 	.reduce(
+// 		(values, [key, val]) => {
+// 		if (
+// 			(/^npm_package_workspaces_[0-9]+$/i).test(key) &&
+// 			typeof val === 'string'
+// 		) {
+// 			values.push(val);
+// 		}
+
+// 		return values;
+// 	}, /** @type {string[]} */ ([]));
 const hasWorkspaces = workspacesConfig.length > 0;
 const hasWorkspacesWatch = hasWorkspaces && hasPkg('jest-watch-yarn-workspaces');
 const hasReact = hasPkg('react');
@@ -51,22 +55,22 @@ const packages = hasWorkspaces && glob(
 		],
 	}
 )
-	.filter(pkgJson => glob('**/*.spec.*', {
-		cwd: path.dirname(pkgJson),
-	}).length > 0)
+	// .filter(pkgJson => glob('**/*.spec.*', {
+	// 	cwd: path.dirname(pkgJson),
+	// }).length > 0)
 	.reduce((pkgs, pkgJson) => ({
 		...pkgs,
 		[require(pkgJson).name]: path.dirname(path.relative(process.cwd(), pkgJson)),
 	}), {});
 const isProd = process.env.NODE_ENV === 'production';
 
-console.dir({
-	hasWorkspaces,
-	hasReact,
-	hasEnzyme,
-}, {
-	colors: true,
-});
+// console.dir({
+// 	hasWorkspaces,
+// 	hasReact,
+// 	hasEnzyme,
+// }, {
+// 	colors: true,
+// });
 
 module.exports = {
 	...(hasWorkspaces && {
@@ -86,6 +90,13 @@ module.exports = {
 			moduleFileExtensions: [
 				'js', 'jsx', 'json', 'ts', 'tsx',
 			],
+			moduleNameMapper: Object.entries(packages)
+				.filter(([name]) => name !== displayName)
+				.reduce((obj, [name, dir]) => ({
+					...obj,
+					[name]: path.join(process.cwd(), dir, 'src'),
+				}), {}),
+			resolver: 'jest-workspace-resolver',
 			timers: 'fake',
 			testURL: 'http://astolat.com',
 			...(hasEnzyme && {
@@ -106,3 +117,6 @@ module.exports = {
 		notify: true,
 	}),
 };
+
+// console.dir(module.exports.projects);
+// process.exit;

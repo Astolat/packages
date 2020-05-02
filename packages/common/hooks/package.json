@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Astolat LLC <dev@astolat.com>",
   "license": "MIT",
   "repository": {
@@ -18,12 +19,7 @@
     "access": "public"
   },
   "bugs": "https://github.com/Astolat/main/issues?q=is:issue+project:@astolat/hooks",
-  "devDependencies": {
-    "@astolat/ts-config": "^0.0.0",
-    "@types/react": "^16.9.17",
-    "react": "^16.12.0"
-  },
   "peerDependencies": {
-    "react": "^16.12.0"
+    "react": "^16.13.1"
   }
 }

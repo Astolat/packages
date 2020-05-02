@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "globby": "^10.0.1",
+    "jest-workspace-resolver": "^1.0.0",
     "ts-jest": "^24.2.0"
   }
 }
