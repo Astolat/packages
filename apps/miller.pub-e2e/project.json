@@ -1,0 +1,9 @@
+{
+  "name": "miller.pub-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/miller.pub-e2e/src",
+  "tags": [],
+  "implicitDependencies": ["miller.pub"],
+  "// targets": "to see all targets run: nx show project miller.pub-e2e --web",
+  "targets": {}
+}
