@@ -1,22 +1,20 @@
 {
-  "name": "miller.pub",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/miller.pub",
-  "projectType": "application",
-  "tags": [],
-  "// targets": "to see all targets run: nx show project miller.pub --web",
-  "targets": {
-    "format": {
-      "executor": "@nx/eslint:lint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
-      "options": {
-        "lintFilePatterns": [
-          "apps/miller.pub/**/*.{ts,tsx,js,jsx}"
-        ],
-        "fix": true
-      }
-    }
-  }
+	"name": "miller.pub",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "apps/miller.pub",
+	"projectType": "application",
+	"tags": [],
+	"// targets": "to see all targets run: nx show project miller.pub --web",
+	"targets": {
+		"format": {
+			"executor": "@nx/eslint:lint",
+			"outputs": ["{options.outputFile}"],
+			"options": {
+				"lintFilePatterns": ["apps/miller.pub/**/*.{ts,tsx,js,jsx}"],
+				"fix": true,
+				"quiet": true,
+				"force": true
+			}
+		}
+	}
 }
